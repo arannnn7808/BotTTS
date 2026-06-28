@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM rustlang/rust:nightly AS builder
+FROM rustlang/rust:nightly-bookworm AS builder
 
 WORKDIR /bot
 
