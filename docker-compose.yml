@@ -1,0 +1,53 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./config.toml
+        target: /config.toml
+        read_only: true
+    depends_on:
+      - database
+      - tts-service
+    networks:
+      - internal
+
+  database:
+    image: postgres:13
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tts
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: tts
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+  tts-service:
+    image: gnomeddev/tts-service
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ${GOOGLE_APPLICATION_CREDENTIALS}
+        target: /gcp.json
+        read_only: true
+    environment:
+      - IPV6_BLOCK
+      - LOG_LEVEL=INFO
+      - BIND_ADDR=0.0.0.0:20310
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp.json
+    expose:
+      - "20310"
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  db-data:
