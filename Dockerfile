@@ -3,7 +3,7 @@ FROM rustlang/rust:nightly AS builder
 
 WORKDIR /bot
 
-RUN apt-get update && apt-get install -y cmake && apt-get clean
+RUN apt-get update && apt-get install -y cmake mold clang && apt-get clean
 
 COPY . .
 
